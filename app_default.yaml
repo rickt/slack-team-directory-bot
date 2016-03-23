@@ -1,0 +1,24 @@
+# This is a comment
+
+# application is mandatory
+application: fonefinderzu
+
+# version is mandatory
+version: 1-29
+
+# environment variables
+env_variables:
+          DEBUG: 'true'
+          SLACK_APP_TOKEN: 'CHANGEME'
+          SLACK_APP_TRIGGERWORD: 'ff'
+          SLACK_USER_TOKEN: 'CHANGEME'
+# runtime is mandatory
+runtime: go
+
+# api_version is mandatory
+api_version: go1
+
+# handlers is mandatory
+handlers:
+- url: /.*
+  script: _go_app
