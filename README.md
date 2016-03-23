@@ -1,7 +1,9 @@
 # slack-fonefinder
 ##### overview
+golang backend for a super-handy Slack /slash command that searches the team directory.
+
 # ☎finder
-go backend for a simple slack phone query slash command. installed as "/ff" in slack, takes a string as "name", searches for it, returns the best match & phone number to the user.
+installed as "/ff" in slack, takes a string argument as "name", searches the Slack Team Directory for it, returns the best match & phone number to the user.
 
 written specifically to run in Google App Engine.  
 
