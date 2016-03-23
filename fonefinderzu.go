@@ -1,4 +1,4 @@
-package fonefinderzu
+package fonefinder
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package fonefinderzu
+package fonefinder
 
 // struct for runtime environment variables
 type envs struct {

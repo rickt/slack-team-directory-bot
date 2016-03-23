@@ -1,11 +1,12 @@
 # slack-fonefinder
 ##### overview
 # ☎finder
-/slash command for Slack that searches your Team Directory / quick phone number lookup. written to run in Google App Engine.  
+go backend for a simple slack phone query slash command. installed as "/ff" in slack, takes a string as "name", searches for it, returns the best match & phone number to the user.
+
+written specifically to run in Google App Engine.  
 
 ##### notes
 * this is written specifically for google app engine, hence no main() and  [github.com/rickt/slack-appengine](https://github.com/rickt/slack-appengine) requirement
-* create a Slack /slash command, note the token
 * change values as appropriate in the environment variable section in your app.yaml
 
 ##### demo
