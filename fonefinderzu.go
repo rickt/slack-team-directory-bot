@@ -57,6 +57,13 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	err = decodeslackrequest(r, &hook)
 	if err != nil {
 		log.Errorf(ctx, "ERROR slackhandler(): error decoding request from slack!! err=%v", err)
+		payload := Payload{
+			Text: "unauthenticated request, tsk tsk!",
+		}
+		js, _ := json.Marshal(payload)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
+		return
 	}
 	if env.Debug {
 		log.Debugf(ctx, "DEBUG slackhandler(): hook.Text=%v, hook.Token=%s, hook.TriggerWord=%v", hook.Text, hook.Token, hook.TriggerWord)
@@ -103,7 +110,7 @@ func decodeslackrequest(r *http.Request, hook *slackRequest) error {
 	// is this a valid request from slack? check for the token
 	if env.Token != hook.Token {
 		log.Errorf(ctx, "ERROR decodeslackrequest(): token received from slack hook.Token=%s does not match expected token env.Token=%s!", hook.Token, env.Token)
-		// return errors.New("error, token received from slack does not match expected token!")
+		return errors.New("error, token received from slack does not match expected token!")
 	}
 	return nil
 }
@@ -123,7 +130,9 @@ func searchforusers(name string, ctx context.Context) ([]*slack.User, error) {
 	// find the name we were given
 	var searchedusers []*slack.User
 	for _, user := range users {
+		// remove bots/non-real users
 		if strings.Contains(user.Profile.Email, "@") {
+			// check username, first & last names
 			if ciContains(user.Name, name) || ciContains(user.Profile.RealName, name) || ciContains(user.Profile.FirstName, name) || ciContains(user.Profile.LastName, name) {
 				searchedusers = append(searchedusers, user)
 				log.Debugf(ctx, "DEBUG   Id=%s, Name=%s, RealName=%s, Phone=%s", user.Id, user.Name, user.Profile.RealName, user.Profile.Phone)
