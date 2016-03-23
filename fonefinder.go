@@ -33,11 +33,11 @@ func init() {
 // func that handles the POST to /slack from slack
 func slackhandler(w http.ResponseWriter, r *http.Request) {
 	// get runtime options from the app.yaml
-	// w/appengine, we can't query environment variables until after init() completes. sucks.jpg
 	isdebug := os.Getenv("DEBUG")
 	if isdebug == "true" {
 		env.Debug = true
 	}
+	// w/appengine, we can't query environment variables until after init() completes. sucks.jpg
 	env.Token = os.Getenv("SLACK_TOKEN")
 	env.TriggerWord = os.Getenv("SLACK_TRIGGERWORD")
 	env.UserToken = os.Getenv("SLACK_USER_TOKEN")
@@ -52,10 +52,10 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	log.Infof(ctx, "DEBUG slackhandler(): env.Token=%s, env.TriggerWord=%s, env.UserToken=%s, env.Debug=%v", env.Token, env.TriggerWord, env.UserToken, env.Debug)
 	// decode slack request
-	err = decodeslackrequest(r, &hook)
+	err = decodeslackrequest(ctx, r, &hook)
 	if err != nil {
+		// unauthenticated request, handle it & error out
 		log.Errorf(ctx, "ERROR slackhandler(): error decoding request from slack!! err=%v", err)
 		payload := Payload{
 			Text: "unauthenticated request, tsk tsk!",
@@ -68,14 +68,15 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	if env.Debug {
 		log.Debugf(ctx, "DEBUG slackhandler(): hook.Text=%v, hook.Token=%s, hook.TriggerWord=%v", hook.Text, hook.Token, hook.TriggerWord)
 	}
-	// search for the user
-	userlist, err := searchforusers(hook.Text, ctx)
+	// search the slack team directory
+	userlist, err := searchforusers(ctx, hook.Text)
 	if env.Debug {
 		log.Debugf(ctx, "DEBUG slackhandler(): userlist=%v", userlist)
 	}
 	// build the response
 	var phone, response string
 	for _, user := range userlist {
+		// if a user doesn't have a phone number, UNLIST them
 		if user.Profile.Phone == "" {
 			phone = "UNLISTED"
 		} else {
@@ -83,6 +84,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		}
 		response = response + fmt.Sprintf("%s %s: :phone: %s :email: <mailto:%s|%s> :slack: <@%s|%s>\n", user.Profile.FirstName, user.Profile.LastName, phone, user.Profile.Email, user.Profile.Email, user.Id, user.Name)
 	}
+	// build the slack payload
 	payload := Payload{
 		// ResponseType: "in_channel",
 		Text: response,
@@ -97,9 +99,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // func that decodes the slack request
-func decodeslackrequest(r *http.Request, hook *slackRequest) error {
-	// create a google appengine context
-	ctx := appengine.NewContext(r)
+func decodeslackrequest(ctx context.Context, r *http.Request, hook *slackRequest) error {
 	// create a decoder
 	decoder := schema.NewDecoder()
 	// decode
@@ -116,12 +116,13 @@ func decodeslackrequest(r *http.Request, hook *slackRequest) error {
 }
 
 // search for the user
-func searchforusers(name string, ctx context.Context) ([]*slack.User, error) {
+func searchforusers(ctx context.Context, name string) ([]*slack.User, error) {
 	if env.UserToken == "" {
 		return nil, errors.New("error, slack user token is invalid!")
 	}
 	// establish slack connection
 	sl := slack.New(env.UserToken, ctx)
+	// get the user list
 	users, err := sl.UsersList()
 	if err != nil {
 		log.Errorf(ctx, "error retrieving userlist, err=%s", err)
