@@ -75,14 +75,22 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// build the response
 	var phone, response string
-	for _, user := range userlist {
-		// if a user doesn't have a phone number, UNLIST them
-		if user.Profile.Phone == "" {
-			phone = "UNLISTED"
-		} else {
-			phone = user.Profile.Phone
+	// if there's more than 1 user in the userlist, we have something to show
+	if len(userlist) > 0 {
+		// go through the userlist, check for blank phone number fields
+		for _, user := range userlist {
+			// if a user doesn't have a phone number, UNLIST them
+			if user.Profile.Phone == "" {
+				phone = "UNLISTED"
+			} else {
+				phone = user.Profile.Phone
+			}
+			// build up the data in our response 1 line at a time
+			response = response + fmt.Sprintf("%s %s: :phone: %s :email: <mailto:%s|%s> :slack: <@%s|%s>\n", user.Profile.FirstName, user.Profile.LastName, phone, user.Profile.Email, user.Profile.Email, user.Id, user.Name)
 		}
-		response = response + fmt.Sprintf("%s %s: :phone: %s :email: <mailto:%s|%s> :slack: <@%s|%s>\n", user.Profile.FirstName, user.Profile.LastName, phone, user.Profile.Email, user.Profile.Email, user.Id, user.Name)
+	} else {
+		// if there's less than 1 user in the userlist, there's nothing to show
+		response = fmt.Sprintf("Sorry, I was not able to find anyone using \"%s\"! :confused:", hook.Text)
 	}
 	// build the slack payload
 	payload := Payload{
@@ -96,6 +104,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	js, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	return
 }
 
 // func that decodes the slack request
