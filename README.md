@@ -6,9 +6,11 @@ user enters: `/ff ric`
 
 response that users sees: 
 
-```Fone Finder BOT [04:41] Only you can see this message
+```
+Fone Finder BOT [04:41] Only you can see this message
    rick tait: :phone: (213) NNN-NNNN :email: rickt@REDACTED.com :slack: @rickt
-   Richard Richardson: :phone: (213) NNN-NNNN :email: richard@richardso.com :slack: @richard```
+   Richard Richardson: :phone: (213) NNN-NNNN :email: richard@richardso.com :slack: @richard
+```
 
 # ☎finder
 the backend: POST to URI `/slack` with appropriate payload `token=TOKEN` and `text=SEARCHSTRING`. returns the best match & phone number to the user. if the expected Slack challenge token is not sent along with the request, the request is dropped. tokens are configured as environment variables in the app.yaml. a separate Slack token is required to POST back into Slack. 
