@@ -31,7 +31,16 @@ written specifically to run in Google App Engine. should be plug-n-play for you.
 * change values as appropriate in the environment variable section in your app.yaml
 
 ##### testing
-`$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=john"`
+* Overview:
+```
+$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=john"`
+```
+* Example run:
+```
+$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=tait"
+{"channel":"","username":"","text":"rick tait: :phone: (213) NNN-NNNN :email: \u003cmailto:rickt@redacted.com|rickt@redacted.com\u003e :slack: \u003c@U0E5ZBQSC|rickt\u003e\n","response_type":"","icon_emoji":"","u
+nfurl_links":false,"attachments":null}
+```
 
 ##### demo
 this app is currently up & running at [fonefinderzu.appspot.com](http://fonefinderzu.appspot.com/slack)
