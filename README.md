@@ -13,13 +13,18 @@ Fone Finder BOT [04:41] Only you can see this message
 ```
 
 # ☎finder
-the backend: POST to URI `/slack` with appropriate payload `token=TOKEN` and `text=SEARCHSTRING`. returns the best match & phone number to the user. if the expected Slack challenge token is not sent along with the request, the request is dropped. tokens are configured as environment variables in the app.yaml. a separate Slack token is required to POST back into Slack. 
+backend basics: 
+* you configure a slack `/slash` command to POST to URI `/slack` with appropriate payload `token=TOKEN` and `text=SEARCHSTRING`
+* the best match & phone number is returned to the user
+* if the expected Slack "challenge" token (get this from your `/slash` command setup) is not sent along with the request, the request is dropped
+* requires a separate Slack "test" token (get this from https://api.slack.com/tokens) to establish backend connection into your Slack to retrieve user data & POST response to request into Slack
+* both tokens are configured as environment variables in the app.yaml
 
 written specifically to run in Google App Engine. should be plug-n-play for you. 
 
-1) deploy to App Engine using `goapp deploy` once you've setup goapp
-2) setup your `/slash` command in Slack
-3) profit
+1. deploy to App Engine using `goapp deploy` once you've setup goapp
+2. setup your `/slash` command in Slack
+3. profit
 
 ##### notes
 * this is written specifically for google app engine, hence no main() and  [github.com/rickt/slack-appengine](https://github.com/rickt/slack-appengine) requirement
