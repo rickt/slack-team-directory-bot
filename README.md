@@ -38,7 +38,7 @@ $ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=
 * Example run:
 ```
 $ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=tait"
-{"channel":"","username":"","text":"rick tait: :phone: (213) NNN-NNNN :email: \u003cmailto:rickt@redacted.com|rickt@redacted.com\u003e :slack: \u003c@U0E5ZBQSC|rickt\u003e\n","response_type":"","icon_emoji":"","u
+{"channel":"","username":"","text":"rick tait: :phone: (213) NNN-NNNN :email: \u003cmailto:rickt@redacted.com|rickt@redacted.com\u003e :slack: \u003c@REDACTED|rickt\u003e\n","response_type":"","icon_emoji":"","u
 nfurl_links":false,"attachments":null}
 ```
 
