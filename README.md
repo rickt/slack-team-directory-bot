@@ -8,7 +8,7 @@ response: Fone Finder BOT [04:41] Only you can see this message
           rick tait: :phone: (213) NNN-NNNN :email: rickt@REDACTED.com :slack: @rickt
 
 # ☎finder
-installed as "/ff" in slack, takes a string parameter to URI "/slack" as "text". request "/slack?text=foo" searches your Slack Team Directory for "foo", returns the best match & phone number to the user. if the expected Slack challenge token is not sent along with the request, the request is dropped. tokens are configured as environment variables in the app.yaml. a Slack token is required to POST back into Slack. 
+installed as "/ff" in slack. POST to URI "slack" with appropriate payload "token=TOKEN" and "text=SEARCHSTRING". returns the best match & phone number to the user. if the expected Slack challenge token is not sent along with the request, the request is dropped. tokens are configured as environment variables in the app.yaml. a separate Slack token is required to POST back into Slack. 
 
 written specifically to run in Google App Engine. should be plug-n-play for you. 
 
