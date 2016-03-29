@@ -11,5 +11,8 @@ written specifically to run in Google App Engine.
 * this is written specifically for google app engine, hence no main() and  [github.com/rickt/slack-appengine](https://github.com/rickt/slack-appengine) requirement
 * change values as appropriate in the environment variable section in your app.yaml
 
+##### testing
+$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=john"
+
 ##### demo
 this app is currently up & running at [fonefinderzu.appspot.com](http://fonefinderzu.appspot.com/slack)
