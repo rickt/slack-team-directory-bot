@@ -2,10 +2,10 @@ package fonefinder
 
 // struct for runtime environment variables
 type envs struct {
-	Debug       bool
-	Token       string
-	TriggerWord string
-	UserToken   string
+	Debug     bool
+	Team      string
+	Token     string
+	UserToken string
 }
 
 // struct for forming a slack request
