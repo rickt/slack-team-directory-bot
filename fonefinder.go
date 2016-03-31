@@ -61,7 +61,7 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 		log.Errorf(ctx, "ERROR error retrieving userlist, err=%s", err)
 	}
 	// search the user list
-	var searchedusers []*slack.User
+	var searchedusers slack.UserData
 	for _, user := range users {
 		// remove bots/non-real users
 		if strings.Contains(user.Profile.Email, "@") {
@@ -79,7 +79,7 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 	if err != nil {
 		log.Errorf(ctx, "error retrieving usergrouplist, err=%s", err)
 	}
-	var searchedgroups []*slack.UserGroup
+	var searchedgroups slack.UserGroupData
 	for _, group := range usergroups {
 		if ciContains(group.Handle, name) || ciContains(group.Description, name) || ciContains(group.Name, name) {
 			searchedgroups = append(searchedgroups, group)
