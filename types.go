@@ -31,6 +31,7 @@ type Payload struct {
 	ResponseType string       `json:"response_type"`
 	Icon_emoji   string       `json:"icon_emoji"`
 	Unfurl_links bool         `json:"unfurl_links"`
+	Link_names   int          `json:"link_names"`
 	Attachments  []Attachment `json:"attachments"`
 }
 type Attachment struct {

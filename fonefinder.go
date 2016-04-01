@@ -17,6 +17,7 @@ import (
 
 // vars
 var (
+	// environment variables
 	env envs
 )
 
@@ -53,6 +54,8 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 	if env.UserToken == "" {
 		return nil, nil, errors.New("error, slack user token is invalid!")
 	}
+	var searchedusers slack.UserData       // slice of slack.Users to store returned users
+	var searchedgroups slack.UserGroupData // slice of slack.UserGroups to store returned usergroups
 	// establish slack connection
 	sl := slack.New(env.UserToken, ctx)
 	// get the user list
@@ -60,13 +63,14 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 	if err != nil {
 		log.Errorf(ctx, "ERROR error retrieving userlist, err=%s", err)
 	}
-	// search the user list
-	var searchedusers slack.UserData
+	// search the user & groups list for the user-specified string
+	// go through the userlist first
 	for _, user := range users {
-		// remove bots/non-real users
+		// discard bots/non-real users by looking for Slack users that have an email address in their profile (bots don't have this)
 		if strings.Contains(user.Profile.Email, "@") {
-			// check username, first & last names
+			// search username, first & last name fields for the user-specified string
 			if ciContains(user.Name, name) || ciContains(user.Profile.RealName, name) || ciContains(user.Profile.FirstName, name) || ciContains(user.Profile.LastName, name) {
+				// we have a hit! add this user to the slice of slack.Users
 				searchedusers = append(searchedusers, user)
 				if env.Debug {
 					log.Debugf(ctx, "DEBUG   user: Id=%s, Name=%s, RealName=%s, Phone=%s", user.Id, user.Name, user.Profile.RealName, user.Profile.Phone)
@@ -74,14 +78,16 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 			}
 		}
 	}
-	// search the group list
+	// get the usergroup list
 	usergroups, err := sl.UserGroupsList()
 	if err != nil {
 		log.Errorf(ctx, "error retrieving usergrouplist, err=%s", err)
 	}
-	var searchedgroups slack.UserGroupData
+	// go through the grouplist second
 	for _, group := range usergroups {
+		// search group name, description & group handle fields for the user-specified string
 		if ciContains(group.Handle, name) || ciContains(group.Description, name) || ciContains(group.Name, name) {
+			// we have a hit! add this group to the slice of slack.UserGroups
 			searchedgroups = append(searchedgroups, group)
 			if env.Debug {
 				log.Debugf(ctx, "DEBUG   group: Id=%s, Name=%s, Handle=%s", group.ID, group.Name, group.Handle)
@@ -101,11 +107,13 @@ func sendit(ctx context.Context, w http.ResponseWriter, textpayload string) {
 	// build the slack payload
 	payload := Payload{
 		// ResponseType: "in_channel",
-		Text: textpayload,
+		Text:       textpayload,
+		Link_names: 1,
 	}
 	js, _ := json.Marshal(payload)
 	if env.Debug {
 		log.Debugf(ctx, "DEBUG sendit(): sent payload=%v", payload)
+		log.Debugf(ctx, "DEBUG sendit(): sent json=%s", js)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
@@ -188,7 +196,8 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 			sort.Sort(usergrouplist)
 			for _, usergroup := range usergrouplist {
 				// build up the group data in our response 1 line at a time
-				response = response + fmt.Sprintf("%s :slack: @%s\n", usergroup.Name, usergroup.Handle)
+				// response = response + fmt.Sprintf("%s :slack: <!subteam^@%s>\n", usergroup.Name, usergroup.ID)
+				response = response + fmt.Sprintf("%s :slack: <@%s>\n", usergroup.Name, usergroup.Handle)
 			}
 		}
 	} else {
