@@ -15,6 +15,12 @@ import (
 	"strings"
 )
 
+// consts
+const (
+	debugstring string = "debug=true"
+	version     string = "1-87"
+)
+
 // vars
 var (
 	// environment variables
@@ -106,12 +112,19 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 func sendit(ctx context.Context, w http.ResponseWriter, textpayload string) {
 	// build the slack payload
 	payload := Payload{
-		// ResponseType: "in_channel",
-		Text:       textpayload,
 		Link_names: 1,
+		// ResponseType: "in_channel",
+		Text: textpayload,
 	}
+	// response = response + fmt.Sprintf("DEBUG request PostForm value %s=%s\n", k, v)
 	js, _ := json.Marshal(payload)
 	if env.Debug {
+		// lets go crazy. rebuild payload with our OG payload in JSON
+		textpayload = textpayload + fmt.Sprintf("DEBUG JSON payload sent to Slack=`%s`\n", js)
+		payload = Payload{
+			Text: textpayload,
+		}
+		js, _ = json.Marshal(payload)
 		log.Debugf(ctx, "DEBUG sendit(): sent payload=%v", payload)
 		log.Debugf(ctx, "DEBUG sendit(): sent json=%s", js)
 	}
@@ -161,6 +174,15 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		sendit(ctx, w, fmt.Sprintf("I'm sorry, but your search phrase \"%s\" is too short! :confused:", hook.Text))
 		return
 	}
+	// check to see is debug mode is being enabled remotely
+	if ciContains(hook.Text, debugstring) {
+		// set debug mode to tue
+		env.Debug = true
+		// remove "debug" from the user's search string
+		ss := strings.Replace(hook.Text, " "+debugstring, "", -1)
+		hook.Text = ss
+	}
+
 	// search the slack team directory
 	var usergrouplist slack.UserGroupData
 	var userlist slack.UserData
@@ -175,13 +197,13 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	if len(userlist) > 0 || len(usergrouplist) > 0 {
 		// go through the userlist first, check for blank phone number fields
 		if len(userlist) > 0 {
-			response = response + fmt.Sprintf("*Users:*\n")
+			response = response + fmt.Sprintf("*Users matching \"%s\":*\n", hook.Text)
 			// sort the userlist and lets go through it
 			sort.Sort(userlist)
 			for _, user := range userlist {
 				// if a user doesn't have a phone number, UNLIST them
 				if user.Profile.Phone == "" {
-					phone = "UNLISTED"
+					phone = "no phone # entered"
 				} else {
 					phone = user.Profile.Phone
 				}
@@ -191,20 +213,38 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// now go through the usergroup list
 		if len(usergrouplist) > 0 {
-			response = response + fmt.Sprintf("*Groups:*\n")
+			response = response + fmt.Sprintf("*Groups matching \"%s\":*\n", hook.Text)
 			// sort the grouplist and lets go through it
 			sort.Sort(usergrouplist)
 			for _, usergroup := range usergrouplist {
 				// build up the group data in our response 1 line at a time
-				// response = response + fmt.Sprintf("%s :slack: <!subteam^@%s>\n", usergroup.Name, usergroup.ID)
-				response = response + fmt.Sprintf("%s :slack: <@%s>\n", usergroup.Name, usergroup.Handle)
+				response = response + fmt.Sprintf("%s :slack: <!subteam^%s>\n", usergroup.Name, usergroup.ID)
 			}
 		}
 	} else {
 		// if there's less than 1 user or usergroup in the list, there's nothing to show
 		response = fmt.Sprintf("I'm sorry, but I was not able to find a user or group using your search term \"%s\"! :confused:", hook.Text)
 	}
+	// debug heaven! dump basically everything. and why not indeed!
+	if env.Debug {
+		response = response + fmt.Sprintf("*Debug Data:*\n")
+		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, version=%s\n", env.Debug, env.Team, version)
+		response = response + fmt.Sprintf("DEBUG len(userlist)=%d, len(usergrouplist)=%d\n", len(userlist), len(usergrouplist))
+		response = response + fmt.Sprintf("DEBUG request Method=%s, Host=%s, URL=%s, Proto=%s, RemoteAddr=%s, Content-Length=%d\n", r.Method, r.Host, r.URL, r.Proto, r.RemoteAddr, r.ContentLength)
+		for k, v := range r.Header {
+			response = response + fmt.Sprintf("DEBUG request Header %s=%s\n", k, v)
+		}
+		for k, v := range r.PostForm {
+			// exclude sensitive things from debug output
+			if !strings.Contains(k, "token") {
+				response = response + fmt.Sprintf("DEBUG request PostForm value %s=%s\n", k, v)
+			}
+		}
+		response = response + fmt.Sprintf("DEBUG hook.TeamID=%s, hook.TeamDomain=%s, hook.UserName=%s, hook.UserID=%s, hook.ChannelName=%s, hook.ChannelID=%s, hook.Text=%s\n", hook.TeamID, hook.TeamDomain, hook.UserName, hook.UserID, hook.ChannelName, hook.ChannelID, hook.Text)
+	}
 	sendit(ctx, w, response)
+	// reset debug mode
+	env.Debug = false
 	return
 }
 
