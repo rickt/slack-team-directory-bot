@@ -4,7 +4,7 @@
 application: yourappnamegoeshere
 
 # version is mandatory
-version: 1-91
+version: 1-1
 
 # environment variables
 env_variables:
@@ -13,8 +13,8 @@ env_variables:
           SLACK_TEAM: 'yourteamgoeshere'
           SLACK_TOKEN: 'CHANGEME'
           SLACK_USER_TOKEN: 'CHANGEME'
-          SRC_HOME: 'https://github.com/rickt/slack-fonefinder'
-          VERSION: version
+          SRC_HOME: 'https://github.com/rickt/slack-team-directory-bot'
+          VERSION: 1-1
 # runtime is mandatory
 runtime: go
 

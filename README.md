@@ -1,23 +1,23 @@
-# slack-fonefinder
+# slack-team-directory-bot
 ##### overview
-golang backend for a super-handy Slack `/slash` command that searches the team directory. i install as `/ff`. example use:
+golang backend for a super-handy Slack `/slash` command that searches the team directory. i install as `/dir`. example use:
 
-user enters: `/ff ric`
+user enters: `/dir ric`
 
 response that users sees: 
 
 ```
-Fone Finder BOT [04:41] Only you can see this message
+Your Company Team Directory Bot [04:41] Only you can see this message
    rick tait: :phone: (213) NNN-NNNN :email: rickt@REDACTED.com :slack: @rickt
    Richard Richardson: :phone: (213) NNN-NNNN :email: richard@richardso.com :slack: @richard
 ```
 
-# ☎finder
+# ☎ slack-team-directory-bot
 backend basics: 
 * you configure a slack `/slash` command to POST to URI `/slack` with appropriate payload `token=TOKEN` and `text=SEARCHSTRING`
 * the best match & phone number is returned to the user
 * if the expected Slack "challenge" token (get this from your `/slash` command setup) is not sent along with the request, the request is dropped
-* requires a separate Slack OAuth2 bearer token (get a quickie from https://api.slack.com/docs/oauth-test-tokens to get going ASAP, but don't use this token permanently!!!) to establish backend connection into your Slack to retrieve user data & POST response to request into Slack
+* requires a separate Slack OAuth2 bearer token (get a quickie from https://api.slack.com/docs/oauth-test-tokens) to establish backend connection into your Slack to retrieve user data & POST response to request into Slack
 * both tokens are configured as environment variables in the app.yaml
 
 written specifically to run in Google App Engine. should be plug-n-play for you. 
