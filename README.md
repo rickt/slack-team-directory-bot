@@ -27,20 +27,18 @@ written specifically to run in Google App Engine. should be plug-n-play for you.
 3. profit
 
 ##### notes
-* this is written specifically for google app engine, hence no main() and  [github.com/rickt/slack-appengine](https://github.com/rickt/slack-appengine) requirement
+* this is written specifically for Google App Engine, hence no main() and  [github.com/rickt/slack-appengine](https://github.com/rickt/slack-appengine) requirement
 * change values as appropriate in the environment variable section in your app.yaml
 
 ##### testing
 * Overview:
 ```
-$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=john"`
+$ curl https://yourappengineurl.appspot.com/slack -XPUT --data "token=REDACTED&text=john"`
 ```
 * Example run:
 ```
-$ curl https://fonefinderzu.appspot.com/slack -XPUT --data "token=REDACTED&text=tait"
+$ curl https://yourappengineurl.appspot.com/slack -XPUT --data "token=REDACTED&text=tait"
 {"channel":"","username":"","text":"rick tait: :phone: (213) NNN-NNNN :email: \u003cmailto:rickt@redacted.com|rickt@redacted.com\u003e :slack: \u003c@REDACTED|rickt\u003e\n","response_type":"","icon_emoji":"","u
 nfurl_links":false,"attachments":null}
 ```
 
-##### demo
-this app is currently up & running at [fonefinderzu.appspot.com](http://fonefinderzu.appspot.com/slack)

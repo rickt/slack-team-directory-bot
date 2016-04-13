@@ -225,7 +225,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	// debug heaven! dump basically everything. and why not indeed!
 	if env.Debug {
 		response = response + fmt.Sprintf("*Debug Data:*\n")
-		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, env.version=%s, env.srchome=%s\n", env.Debug, env.Team, env.Version, env.SrcHome)
+		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, env.version=%s, env.Srchome=%s\n", env.Debug, env.Team, env.Version, env.SrcHome)
 		response = response + fmt.Sprintf("DEBUG len(userlist)=%d, len(usergrouplist)=%d\n", len(userlist), len(usergrouplist))
 		response = response + fmt.Sprintf("DEBUG request Method=%s, Host=%s, URL=%s, Proto=%s, RemoteAddr=%s, Content-Length=%d\n", r.Method, r.Host, r.URL, r.Proto, r.RemoteAddr, r.ContentLength)
 		for k, v := range r.Header {
