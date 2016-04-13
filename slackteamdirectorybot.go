@@ -112,16 +112,7 @@ func sendit(ctx context.Context, w http.ResponseWriter, textpayload string) {
 	}
 	// response = response + fmt.Sprintf("DEBUG request PostForm value %s=%s\n", k, v)
 	js, _ := json.Marshal(payload)
-	if env.Debug {
-		// lets go crazy. rebuild payload with our OG payload in JSON
-		textpayload = textpayload + fmt.Sprintf("DEBUG JSON payload sent to Slack=`%s`\n", js)
-		payload = Payload{
-			Text: textpayload,
-		}
-		js, _ = json.Marshal(payload)
-		log.Debugf(ctx, "DEBUG sendit(): sent payload=%v", payload)
-		log.Debugf(ctx, "DEBUG sendit(): sent json=%s", js)
-	}
+	// send it
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 	return
@@ -225,18 +216,23 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	// debug heaven! dump basically everything. and why not indeed!
 	if env.Debug {
 		response = response + fmt.Sprintf("*Debug Data:*\n")
-		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, env.version=%s, env.Srchome=%s\n", env.Debug, env.Team, env.Version, env.SrcHome)
-		response = response + fmt.Sprintf("DEBUG len(userlist)=%d, len(usergrouplist)=%d\n", len(userlist), len(usergrouplist))
-		response = response + fmt.Sprintf("DEBUG request Method=%s, Host=%s, URL=%s, Proto=%s, RemoteAddr=%s, Content-Length=%d\n", r.Method, r.Host, r.URL, r.Proto, r.RemoteAddr, r.ContentLength)
+		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, env.version=%s, env.SrcHome=%s\n", env.Debug, env.Team, env.Version, env.SrcHome)
+		// response from Slack
+		response = response + fmt.Sprintf("DEBUG response from Slack Method=%s, Host=%s, URL=%s, Proto=%s, RemoteAddr=%s, Content-Length=%d\n", r.Method, r.Host, r.URL, r.Proto, r.RemoteAddr, r.ContentLength)
+		// response from Slack headers
 		for k, v := range r.Header {
-			response = response + fmt.Sprintf("DEBUG request Header %s=%s\n", k, v)
+			response = response + fmt.Sprintf("DEBUG response from Slack Header %s=%s\n", k, v)
 		}
+		// response from Slack formdata
 		for k, v := range r.PostForm {
 			// exclude sensitive things from debug output
-			if !strings.Contains(k, "response_url") || !strings.Contains(k, "token") {
-				response = response + fmt.Sprintf("DEBUG request PostForm value %s=%s\n", k, v)
+			if strings.Contains(k, "response_url") || strings.Contains(k, "token") {
+				response = response + fmt.Sprintf("DEBUG response from Slack PostForm %s=REDACTED\n", k)
+			} else {
+				response = response + fmt.Sprintf("DEBUG response from Slack PostForm %s=%s\n", k, v)
 			}
 		}
+		response = response + fmt.Sprintf("DEBUG response from Slack len(userlist)=%d, len(usergrouplist)=%d\n", len(userlist), len(usergrouplist))
 		response = response + fmt.Sprintf("DEBUG hook.TeamID=%s, hook.TeamDomain=%s, hook.UserName=%s, hook.UserID=%s, hook.ChannelName=%s, hook.ChannelID=%s, hook.Text=%s\n", hook.TeamID, hook.TeamDomain, hook.UserName, hook.UserID, hook.ChannelName, hook.ChannelID, hook.Text)
 	}
 	sendit(ctx, w, response)
