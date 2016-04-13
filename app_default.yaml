@@ -4,14 +4,17 @@
 application: yourappnamegoeshere
 
 # version is mandatory
-version: 1-29
+version: 1-91
 
 # environment variables
 env_variables:
           DEBUG: 'true'
+          DEBUGSTRING: 'debug=true'
           SLACK_TEAM: 'yourteamgoeshere'
           SLACK_TOKEN: 'CHANGEME'
           SLACK_USER_TOKEN: 'CHANGEME'
+          SRC_HOME: 'https://github.com/rickt/slack-fonefinder'
+          VERSION: version
 # runtime is mandatory
 runtime: go
 

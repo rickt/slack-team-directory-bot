@@ -15,12 +15,6 @@ import (
 	"strings"
 )
 
-// consts
-const (
-	debugstring string = "debug=true"
-	version     string = "1-87"
-)
-
 // vars
 var (
 	// environment variables
@@ -141,9 +135,12 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		env.Debug = true
 	}
 	// with appengine, we can't query environment variables until after init() completes. sucks.jpg
+	env.Debugstring = os.Getenv("DEBUGSTRING")
+	env.SrcHome = os.Getenv("SRC_HOME")
 	env.Team = os.Getenv("SLACK_TEAM")
 	env.Token = os.Getenv("SLACK_TOKEN")
 	env.UserToken = os.Getenv("SLACK_USER_TOKEN")
+	env.Version = os.Getenv("VERSION")
 	// create a google appengine context
 	ctx := appengine.NewContext(r)
 	hook := slackRequest{}
@@ -175,11 +172,11 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// check to see is debug mode is being enabled remotely
-	if ciContains(hook.Text, debugstring) {
+	if ciContains(hook.Text, env.Debugstring) {
 		// set debug mode to tue
 		env.Debug = true
 		// remove "debug" from the user's search string
-		ss := strings.Replace(hook.Text, " "+debugstring, "", -1)
+		ss := strings.Replace(hook.Text, " "+env.Debugstring, "", -1)
 		hook.Text = ss
 	}
 
@@ -228,7 +225,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 	// debug heaven! dump basically everything. and why not indeed!
 	if env.Debug {
 		response = response + fmt.Sprintf("*Debug Data:*\n")
-		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, version=%s\n", env.Debug, env.Team, version)
+		response = response + fmt.Sprintf("DEBUG env.Debug=%v, env.Team=%s, env.version=%s, env.srchome=%s\n", env.Debug, env.Team, env.Version, env.SrcHome)
 		response = response + fmt.Sprintf("DEBUG len(userlist)=%d, len(usergrouplist)=%d\n", len(userlist), len(usergrouplist))
 		response = response + fmt.Sprintf("DEBUG request Method=%s, Host=%s, URL=%s, Proto=%s, RemoteAddr=%s, Content-Length=%d\n", r.Method, r.Host, r.URL, r.Proto, r.RemoteAddr, r.ContentLength)
 		for k, v := range r.Header {
