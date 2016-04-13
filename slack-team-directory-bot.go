@@ -1,4 +1,4 @@
-package fonefinder
+package slackteamdirectorybot
 
 import (
 	"encoding/json"
@@ -233,7 +233,7 @@ func slackhandler(w http.ResponseWriter, r *http.Request) {
 		}
 		for k, v := range r.PostForm {
 			// exclude sensitive things from debug output
-			if !strings.Contains(k, "token") {
+			if !strings.Contains(k, "response_url") || !strings.Contains(k, "token") {
 				response = response + fmt.Sprintf("DEBUG request PostForm value %s=%s\n", k, v)
 			}
 		}

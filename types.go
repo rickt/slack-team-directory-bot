@@ -1,4 +1,4 @@
-package fonefinder
+package slackteamdirectorybot
 
 // struct for runtime environment variables
 type envs struct {
