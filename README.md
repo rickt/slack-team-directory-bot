@@ -54,6 +54,11 @@ nfurl_links":false,"attachments":null}
 </pre>
 * Slack then makes a call to our directory bot (assuming the /slash command is setup correctly), effectively doing the equivalent of: 
 <pre>$ curl https://yourappengineurl.appspot.com/slack -XPUT --data "token=REDACTED&text=foo"</pre>
+* the directory bot checks to see if the token sent along with the request is valid, and assuming it is, the bot then:
+  * calls a few Slack APIs searching for the user's searchstring foo
+  * receives JSON data from Slack in response to those API calls
+  * assuming a positive search match, massages the data a bit so it looks pretty
+  * packs it up all and sends a JSON message back to Slack, which is displayed to the OG requesting user
 * an unauthenticated request to the directory bot (one without a valid key) will receive a response back as below 
 <pre>
 {
