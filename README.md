@@ -12,6 +12,10 @@ Your Company Team Directory Bot [04:41] Only you can see this message
    Richard Richardson: :phone: (213) NNN-NNNN :email: richard@richardso.com :slack: @richard
 ```
 
+a screenshot/example of what your Slack users might see in response to typing `/dir account` to look for someone in the accounting department:
+
+![ScreenShot](http://i.imgur.com/S9RNz8E.png)
+
 # ☎ slack-team-directory-bot
 backend basics: 
 * you configure a slack `/slash` command to POST to URI `/slack` with appropriate payload `token=TOKEN` and `text=SEARCHSTRING`
