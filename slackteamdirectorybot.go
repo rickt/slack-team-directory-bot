@@ -37,7 +37,7 @@ func decodeslackrequest(ctx context.Context, r *http.Request, hook *slackRequest
 	}
 	// is this a valid request from slack? check for the token
 	if env.Token != hook.Token {
-		log.Criticalf(ctx, "ERROR decodeslackrequest(): token received from slack hook.Token=%s does not match expected token env.Token=%s!", hook.Token, env.Token)
+		log.Criticalf(ctx, "ERROR decodeslackrequest(): token received from slack hook.Token does not match expected token env.Token!")
 		return errors.New("error, token received from slack does not match expected token!")
 	}
 	return nil
