@@ -67,7 +67,7 @@ func searchforusers(ctx context.Context, name string) (slack.UserData, slack.Use
 	// go through the userlist first
 	for _, user := range users {
 		// discard bots/non-real users by looking for Slack users that have an email address in their profile (bots don't have this)
-		if strings.Contains(user.Profile.Email, "@") {
+		if strings.Contains(user.Profile.Email, "@") && user.Deleted != true {
 			// search username, first & last name fields for the user-specified string
 			if ciContains(user.Name, name) || ciContains(user.Profile.RealName, name) || ciContains(user.Profile.FirstName, name) || ciContains(user.Profile.LastName, name) {
 				// we have a hit! add this user to the slice of slack.Users
