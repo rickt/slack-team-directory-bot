@@ -59,6 +59,7 @@ nfurl_links":false,"attachments":null}
   * receives JSON data from Slack in response to those API calls
   * assuming a positive search match, massages the data a bit so it looks pretty
   * packs it up all and sends a JSON message back to Slack, which is displayed to the OG requesting user
+
 * an unauthenticated request to the directory bot (one without a valid key) will receive a response back as below 
 <pre>
 {
